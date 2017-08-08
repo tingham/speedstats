@@ -1,0 +1,15 @@
+{
+  "name": "speedstats",
+  "version": "1.0.0",
+  "description": "Records bandwidth stats using speedtest-cli.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Thomas Ingham <tingham@mac.com>",
+  "license": "ISC",
+  "dependencies": {
+    "mysql2": "^1.4.0",
+    "sequelize": "^4.4.2"
+  }
+}
