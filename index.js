@@ -1,5 +1,7 @@
 let child_process = require("child_process")
-let cmd = "speedtest-cli --json"
+let outfile = "./last.log"
+let fs = require("fs")
+let cmd = "/usr/local/bin/speedtest-cli --json"
 let dsn = process.env.SPEEDSTATS_DSN
 let Sequelize = require("sequelize")
 let sequelize = new Sequelize(dsn)
@@ -27,6 +29,7 @@ sequelize
 	})
 	.catch((err) => {
 		console.error(err)
+		fs.appendFile(outfile, err)
 	})
 
 function speedTest () {
@@ -34,6 +37,7 @@ function speedTest () {
 		child_process.exec(cmd, (err, stdout, stderr) => {
 			if (err) {
 				console.log(err)
+				fs.appendFile(outfile, err)
 				return reject(1)
 			}
 
@@ -41,6 +45,7 @@ function speedTest () {
 
 			Stat.sync().then(() => {
 				Stat.create(obj)
+				fs.appendFile(outfile, obj)
 				return resolve(0)
 			})
 		})
