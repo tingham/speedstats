@@ -3,24 +3,9 @@ let outfile = "./last.log"
 let fs = require("fs")
 let cmd = "/usr/local/bin/speedtest-cli --json"
 let dsn = process.env.SPEEDSTATS_DSN
-let Sequelize = require("sequelize")
-let sequelize = new Sequelize(dsn)
-let Stat = sequelize.define("stat", {
-	"timestamp": {
-		type: Sequelize.DATE
-	},
-	"ping": {
-		type: Sequelize.DOUBLE
-	},
-	"download": {
-		type: Sequelize.DOUBLE
-	},
-	"upload": {
-		type: Sequelize.DOUBLE
-	}
-})
+let app = require("./models/index.js")({})
 
-sequelize
+app.db.sequelize
 	.authenticate()
 	.then(() => {
 		speedTest().then(() => {
@@ -43,8 +28,8 @@ function speedTest () {
 
 			let obj = JSON.parse(stdout)
 
-			Stat.sync().then(() => {
-				Stat.create(obj)
+			app.db.stat.sync().then(() => {
+				app.db.stat.create(obj)
 				fs.appendFile(outfile, obj)
 				return resolve(0)
 			})

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.15/c3.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.15/c3.min.css" />
+    <script src="/data.js"></script>
+  <script>
+    var download_data = <%- JSON.stringify(download_data) %>
+    var upload_data = <%- JSON.stringify(upload_data) %>
+    var ping_data = <%- JSON.stringify(ping_data) %>
+  </script>
+  </head>
+  <body>
+    <h1><%= title %></h1>
+    <div id="download"></div>
+    <div id="upload"></div>
+    <div id="ping"></div>
+  </body>
+</html>

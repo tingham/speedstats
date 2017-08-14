@@ -1,0 +1,11 @@
+{
+  "development": {
+    "use_env_variable": "SPEEDSTATS_DSN"
+  },
+  "test": {
+    "use_env_variable": "SPEEDSTATS_DSN"
+  },
+  "production": {
+    "use_env_variable": "SPEEDSTATS_DSN"
+  }
+}
