@@ -4,9 +4,9 @@ $(document).ready(function () {
 		bindto: "#download",
 		data: download_data,
 		type: "spline",
-		subchart: {
-			show: true
-		},
+		// subchart: {
+		// 	show: true
+		// },
 		axis: {
 			x: {
 				type: "timeseries",
