@@ -3,6 +3,9 @@ let router = express.Router()
 let _ = require("lodash")
 let moment = require("moment")
 
+// Display ping on an inverted chart (taller values == better.)
+let INVERT_PING = true
+
 router.get('/', function(req, res, next) {
 
   app.db.stat.findAll({order: app.db.sequelize.literal("timestamp ASC")}).then((stats) => {
@@ -110,23 +113,24 @@ router.get('/', function(req, res, next) {
 
       let down = stat.download / 1048576
       let up = stat.upload / 1048576
+      let ping = stat.ping * (INVERT_PING ? -1 : 1)
 
       if (inst_tag != day_tag) {
 	dDaily = down
 	uDaily = up
-	pDaily = stat.ping
+	pDaily = ping
 	day_tag = inst_tag
 	daily = 1
       } else {
 	dDaily += down
 	uDaily += up
-	pDaily += stat.ping
+	pDaily += ping
 	daily++
       }
 
       dAvg += down
       uAvg += up
-      pAvg += stat.ping
+      pAvg += ping
 
       download_data.columns[0].push(moment(stat.timestamp).format("YYYY-MM-DD HH:mm"))
       download_data.columns[1].push(down)
@@ -139,7 +143,7 @@ router.get('/', function(req, res, next) {
       upload_data.columns[4].push(uDaily / daily)
 
       ping_data.columns[0].push(moment(stat.timestamp).format("YYYY-MM-DD HH:mm"))
-      ping_data.columns[1].push(stat.ping)
+      ping_data.columns[1].push(ping)
       ping_data.columns[2].push(pAvg / index)
       ping_data.columns[4].push(pDaily / daily)
     })
