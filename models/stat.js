@@ -12,6 +12,9 @@ function init (Sequelize, sequelize) {
 		},
 		"upload": {
 			type: sequelize.DOUBLE
+		},
+		"ssid": {
+			type: sequelize.STRING
 		}
 	})
 

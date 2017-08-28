@@ -7,8 +7,17 @@ let moment = require("moment")
 let INVERT_PING = true
 
 router.get('/', function(req, res, next) {
+  let ssid = req.query.hasOwnProperty("ssid") ? req.query.ssid : ""
+  let startDate = (req.query.hasOwnProperty("startDate") ? moment(req.query.startDate) : moment(new Date()).subtract(7, "days")).format("YYYY-MM-DD")
+  let endDate = moment(new Date()).add(1, "days").format("YYYY-MM-DD")
 
-  app.db.stat.findAll({order: app.db.sequelize.literal("timestamp ASC")}).then((stats) => {
+  let where = {"timestamp": {$gte: startDate, $lte: endDate}}
+
+  if (!_.isEmpty(ssid)) {
+    where.ssid = ssid
+  }
+
+  app.db.stat.findAll({where: where}, {order: app.db.sequelize.literal("timestamp ASC")}).then((stats) => {
     let download_data = {
       x: "x",
       xFormat: "%Y-%m-%d %H:%M",
@@ -158,5 +167,12 @@ router.get('/', function(req, res, next) {
   })
 
 })
+
+router.get("/ssid/",
+  function (req, res, next) {
+    app.db.stat.aggregate("ssid", "DISTINCT", {plain: false}).then((names) => {
+      res.end(JSON.stringify(names))
+    })
+  })
 
 module.exports = router

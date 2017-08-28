@@ -3,22 +3,52 @@
   <head>
     <title><%= title %></title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.15/c3.min.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.15/c3.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.15/c3.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js"></script>
+    <script src="http://underscorejs.org/underscore-min.js"></script>
     <script src="/data.js"></script>
-  <script>
-    var download_data = <%- JSON.stringify(download_data) %>
-    var upload_data = <%- JSON.stringify(upload_data) %>
-    var ping_data = <%- JSON.stringify(ping_data) %>
-  </script>
+    <script>
+var download_data = <%- JSON.stringify(download_data) %>
+  var upload_data = <%- JSON.stringify(upload_data) %>
+  var ping_data = <%- JSON.stringify(ping_data) %>
+    </script>
   </head>
   <body>
-    <h1><%= title %></h1>
-    <em><%= caption %></h1>
-    <div id="download"></div>
-    <div id="upload"></div>
-    <div id="ping"></div>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-12">
+          <h1><%= title %></h1>
+          <em><%= caption %></em>
+        </div>
+      </div>
+        <form>
+      <div class="row">
+          <div class="col-sm-6 card">
+            <div class="form-group">
+              <label for="ssid">SSID</label>
+              <select id="ssid" class="form-control" remote="/ssid/">
+                <option val="">Specify a particular SSID</option>
+              </select>
+            </div>
+          </div>
+      </div>
+        </form>
+      <div class="row">
+        <div class="col-sm-12">
+          <div id="download"></div>
+        </div>
+        <div class="col-sm-12">
+          <div id="upload"></div>
+        </div>
+        <div class="col-sm-12">
+          <div id="ping"></div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
