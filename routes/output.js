@@ -9,7 +9,7 @@ let INVERT_PING = true
 router.get('/', function(req, res, next) {
   let ssid = req.query.hasOwnProperty("ssid") ? req.query.ssid : ""
   let startDate = (req.query.hasOwnProperty("startDate") ? moment(req.query.startDate) : moment(new Date()).subtract(7, "days")).format("YYYY-MM-DD")
-  let endDate = moment(new Date()).add(1, "days").format("YYYY-MM-DD")
+  let endDate = moment(new Date()).add(2, "days").format("YYYY-MM-DD")
 
   let where = {"timestamp": {$gte: startDate, $lte: endDate}}
 
