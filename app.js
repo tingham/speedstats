@@ -1,12 +1,13 @@
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
+let express = require('express')
+let path = require('path')
+let favicon = require('serve-favicon')
+let logger = require('morgan')
+let cookieParser = require('cookie-parser')
+let bodyParser = require('body-parser')
+let moment = require("moment")
 
-var index = require('./routes/index');
-var output = require('./routes/output');
+let index = require('./routes/index')
+let output = require('./routes/output')
 
 let child_process = require("child_process")
 let outfile = "./last.log"
@@ -21,7 +22,7 @@ let ssidCommand = "/usr/sbin/system_profiler SPAirPortDataType | awk -F':' '/Cur
 	"}'"
 let schedule = require("node-schedule")
 
-var app = express();
+let app = express();
 require("./models/index.js")(app)
 
 // view engine setup
@@ -62,60 +63,68 @@ let job = schedule.scheduleJob("1 * * * *", recordStats)
 
 global["app"] = app
 
+console.log("Running restart capture", moment(new Date()).format("YYYY-MM-DD HH:mm:ss"))
+recordStats()
+
 function recordStats () {
-	console.log("Beginning job.")
-	app.db.sequelize
-		.authenticate()
-		.then(() => {
-			SSID().then( (ssid) => {
-				speedTest(ssid).then( () => {
-					console.log("Wrote record.")
-				})
-			})
-		})
-		.catch((err) => {
-			console.error(err)
-			fs.appendFile(outfile, err)
-		})
+  console.log("Beginning job.")
+  app.db.sequelize
+    .authenticate()
+    .then(() => {
+      SSID().then( (ssid) => {
+	speedTest(ssid).then( () => {
+	  console.log("Wrote record.")
+	})
+      })
+    })
+    .catch((err) => {
+      console.error(err)
+      fs.appendFile(outfile, err)
+    })
 }
 
 function speedTest (ssid) {
-	return new Promise(function (resolve, reject) {
-		child_process.exec(cmd, (err, stdout, stderr) => {
-			if (err) {
-				console.log(err)
-				fs.appendFile(outfile, err)
-				return reject(1)
-			}
+  return new Promise(function (resolve, reject) {
+    let speedtest = require("speedtest-net")
+    let test = speedtest({maxTime: 120000})
+    var timestamp = moment().format("YYYY-MM-DD HH:mm:ss")
+    console.log(timestamp)
 
-			let obj = JSON.parse(stdout)
-			let graph = {}
-			graph.timestamp = obj.timestamp
-			graph.ping = obj.ping
-			graph.download = obj.download
-			graph.upload = obj.upload
-			graph.ssid = ssid.trim()
+    test.on("downloadspeedprogress", speed => {
+      console.log((speed * 125).toFixed(2) + " KB/s")
+    })
 
-			app.db.stat.sync().then(() => {
-				app.db.stat.create(graph)
-				fs.appendFile(outfile, graph)
-				return resolve(0)
-			})
-		})
+    test.on("data", data => {
+      console.dir(data)
+      if (data) {
+	let graph = {}
+	graph.download = data.speeds.download * 1024 * 1024
+	graph.upload = data.speeds.upload * 1024 * 1024
+	graph.ping = data.server.ping
+	graph.timestamp = timestamp
+	graph.ssid = ssid.trim()
+
+	app.db.stat.sync().then(() => {
+	  app.db.stat.create(graph)
+	  fs.appendFile(outfile, graph)
+	  return resolve(0)
 	})
+      }
+    })
+  })
 }
 
 function SSID () {
-	return new Promise(function (resolve, reject) {
-		child_process.exec(ssidCommand, (err, stdout, stderr) => {
-			if (err) {
-				console.log(err)
-				fs.appendFile(outfile, err)
-				return reject("Uknown SSID")
-			}
-			return resolve(stdout)
-		})
-	})
+  return new Promise(function (resolve, reject) {
+    child_process.exec(ssidCommand, (err, stdout, stderr) => {
+      if (err) {
+	console.log(err)
+	fs.appendFile(outfile, err)
+	return reject("Uknown SSID")
+      }
+      return resolve(stdout)
+    })
+  })
 }
 
 module.exports = app;

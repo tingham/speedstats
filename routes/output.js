@@ -9,13 +9,17 @@ let INVERT_PING = true
 router.get('/', function(req, res, next) {
   let ssid = req.query.hasOwnProperty("ssid") ? req.query.ssid : ""
   let startDate = (req.query.hasOwnProperty("startDate") ? moment(req.query.startDate) : moment(new Date()).subtract(7, "days")).format("YYYY-MM-DD")
-  let endDate = moment(new Date()).add(2, "days").format("YYYY-MM-DD")
+  let endDate = moment(new Date()).add(3, "days").format("YYYY-MM-DD")
 
-  let where = {"timestamp": {$gte: startDate, $lte: endDate}}
+  let where = {"timestamp": {$gte: startDate}}
 
   if (!_.isEmpty(ssid)) {
     where.ssid = ssid
   }
+
+  let startTime = new Date()
+
+  console.log(where)
 
   app.db.stat.findAll({where: where}, {order: app.db.sequelize.literal("timestamp ASC")}).then((stats) => {
     let download_data = {
@@ -162,6 +166,8 @@ router.get('/', function(req, res, next) {
       upload_data.columns[3].push(uAvg / stats.length)
       ping_data.columns[3].push(pAvg / stats.length)
     })
+
+    console.log("Execution Time", ((new Date()).getTime() - startTime.getTime()))
 
     res.render("index", {title: "Speedstats", caption: "Self-hosted bandwidth stats keeper.", download_data: download_data, upload_data: upload_data, ping_data: ping_data})
   })
